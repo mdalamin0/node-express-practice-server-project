@@ -1,34 +1,42 @@
 import type { Request, Response } from "express";
 import { pool } from "../../db";
 import { userService } from "./user.service";
+import sendResponse from "../../utility/sendResponse";
 
 // create user
-const {createUserIntoDB, getAllUserFromDB, getSingleUserFromDB, updateUserIntoDB, deleteUserFromDB} = userService;
+const {
+  createUserIntoDB,
+  getAllUserFromDB,
+  getSingleUserFromDB,
+  updateUserIntoDB,
+  deleteUserFromDB,
+} = userService;
 const createUser = async (req: Request, res: Response) => {
   // const { name, email, password, age } = req.body;
   try {
-    const result = await createUserIntoDB(req.body)
-    console.log(result);
-    res.status(201).json({
+    const result = await createUserIntoDB(req.body);
+
+    sendResponse(res, {
+      statusCode: 201,
+      message: "User created successfully",
       success: true,
-      message: "User Created successfully",
-      data: result.rows[0],
+      data:result.rows[0]
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-      error: error,
-    });
+   sendResponse(res, {
+     statusCode: 500,
+     message: error.message,
+     success: false,
+     error: error
+   });
   }
 };
 
 // get user from db
 
-const getAllUser = async (req: Request, res:Response) => {
+const getAllUser = async (req: Request, res: Response) => {
   try {
-   const users = await getAllUserFromDB();
-    console.log(users);
+    const users = await getAllUserFromDB();
     res.status(200).json({
       success: true,
       message: "users retrived successfully!",
@@ -47,7 +55,7 @@ const getAllUser = async (req: Request, res:Response) => {
 const getSingleUser = async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
-    const result = await getSingleUserFromDB(id as string)
+    const result = await getSingleUserFromDB(id as string);
     if (result.rows.length === 0) {
       res.status(404).json({
         success: false,
@@ -58,9 +66,8 @@ const getSingleUser = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Single user retrived successfully",
-      data: result.rows,
+      data: result.rows[0],
     });
-    console.log(result.rows);
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -70,7 +77,7 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 
-// update user 
+// update user
 
 const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -89,7 +96,6 @@ const updateUser = async (req: Request, res: Response) => {
       message: "User updated successfully",
       data: result.rows[0],
     });
-    console.log(result.rows);
   } catch (error: any) {
     res.status(400).json({
       success: false,
@@ -132,5 +138,5 @@ export const userController = {
   getAllUser,
   getSingleUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };
